@@ -96,13 +96,12 @@ If you're interested in learning more about front-end web technologies, be sure 
 
 #### Let's do some TypeScript already
 
-Patience!
-
 TypeScript compiles into JavaScript – so we'll start by making sure we can get JavaScript working:
 
 Create a new file called `game.js` with contents `alert("Hello, world!")` in a folder called `js`. From your terminal:
 
 `$ mkdir js`
+
 `$ echo 'alert("Hello, world!")' > js/game.js`
 
 Tell the browser to read and run this code:
@@ -124,6 +123,7 @@ Make sure it's installed on your computer:
 From the root of your project, make a folder called `ts` and add a file with contents `alert("Hello, world! Love, TypeScript")` called `game.ts`:
 
 `$ mkdir ts`
+
 `$ echo 'alert("Hello, world! Love, TypeScript")' > ts/game.ts`
 
 Let's get a bit of the game built as well; for our game to work, we're going to need a few variables:
