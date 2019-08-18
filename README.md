@@ -198,7 +198,7 @@ If you refresh your game now you should see the alert from TypeScript.
 
 That's the end of the first session.
 
-You can view all of the code for this
+[View completed branch: 1-ts-setup-end](https://github.com/adaapp/rock-paper-typescript/tree/1-ts-setup-end)
 
  
 
