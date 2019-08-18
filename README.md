@@ -133,7 +133,7 @@ RPS is generally played as best of three. We'll need a `counter` to keep track, 
 ```typescript
 alert("Hello, world! Love, TypeScript")
 let userScore: number = 0
-let gameScore: number = 0
+let computerScore: number = 0
 let counter: number = 0
 ```
 
@@ -200,7 +200,28 @@ That's the end of the first session.
 
 [View completed branch: 1-ts-setup-end](https://github.com/adaapp/rock-paper-typescript/tree/1-ts-setup-end)
 
- 
+## Creating our basic game engine
+
+We need to:
+
+1. wire up the button in the HTML to a function in our code that starts the game
+2. write a function that randomly chooses one of rock, paper or scissors
+3. create new buttons that let the user choose
+4. write a function that works out who wins
+
+1. Wiring up our button
+
+Create a function called startGame inside `game.ts`. It shouldn't return anything and should reset the scores and counter to zero:
+
+```typescript
+function startGame(): void {
+  counter = 0
+  userScore = 0
+  computerScore = 0
+}
+```
+
+
 
 
 
