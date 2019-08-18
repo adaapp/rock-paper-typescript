@@ -30,9 +30,9 @@ Otherwise, open Visual Studio Code on your computer and choose `Open folder` and
 
 The only things in the default branch are the following:
 
-* `img` -> directory containing a screenshot of the game and the three images we'll need
-* `README.md` -> this document
-* `.gitignore` -> a list of files for git to ignore
+- `img` -> directory containing a screenshot of the game and the three images we'll need
+- `README.md` -> this document
+- `.gitignore` -> a list of files for git to ignore
 
 **You will be coding along in the root of the project**
 
@@ -86,7 +86,7 @@ While we're at it, let's set some default styles. If you do a colour picker of t
       font-size: 1.2rem;
       border: 0.25rem solid black;
       padding: 0.5rem;
-      margin: 0.5rem;
+      margin: 1rem 0.5rem;
     }
   </style>
 </head>
@@ -167,6 +167,7 @@ Manually running the `tsc` command each time is a pain. We also want the game.js
   "exclude": ["node_modules", "**/*.spec.ts"]
 }
 ```
+
 We're going paste this into a file called `tsconfig.json` in the root of our project (i.e. next to this README.md file and the index.html file). Do this now please.
 
 We need to tweak it a bit. Let's update the paths to work for us:
@@ -186,15 +187,16 @@ We need to tweak it a bit. Let's update the paths to work for us:
   "exclude": ["img", "js"]
 }
 ```
-This file will read any `.ts` files inside a folder called `ts`. It won't remove comments which means people reading your source code will be able to learn from you (if you haven't already, [read this powerful case from Rachel Andrews on making our projects "learnable"](https://rachelandrew.co.uk/archives/2019/01/30/html-css-and-our-vanishing-industry-entry-points/)). It won't look for typescript files in our `img` or `js` directories. And it'll enable source maps  – these help browser-based dev tools help you debug, by showing you the line-numbers in your TypeScript files when you have errors in your compiled JavaScript files.
 
-Best of all, thanks to `"watch": true` it will run in the background so we don't have to keep manually running the compiler. 
+This file will read any `.ts` files inside a folder called `ts`. It won't remove comments which means people reading your source code will be able to learn from you (if you haven't already, [read this powerful case from Rachel Andrews on making our projects "learnable"](https://rachelandrew.co.uk/archives/2019/01/30/html-css-and-our-vanishing-industry-entry-points/)). It won't look for typescript files in our `img` or `js` directories. And it'll enable source maps – these help browser-based dev tools help you debug, by showing you the line-numbers in your TypeScript files when you have errors in your compiled JavaScript files.
+
+Best of all, thanks to `"watch": true` it will run in the background so we don't have to keep manually running the compiler.
 
 Check it's all working by running the following from the root of the project:
 
 `$ tsc`
 
-If you refresh your game now you should see the alert from TypeScript. 
+If you refresh your game now you should see the alert from TypeScript.
 
 That's the end of the first session.
 
@@ -209,20 +211,275 @@ We need to:
 3. create new buttons that let the user choose
 4. write a function that works out who wins
 
-1. Wiring up our button
+### 1. Wiring up our button
 
 Create a function called startGame inside `game.ts`. It shouldn't return anything and should reset the scores and counter to zero:
 
 ```typescript
 function startGame(): void {
-  counter = 0
   userScore = 0
   computerScore = 0
+  counter = 0
+  outputMessage("The game has begun!")
+  hideStartButton()
 }
 ```
 
+Let's also create a function for showing messages. For now, this can just alert things out, but later on we can make it add a paragraph to the page.
 
+```typescript
+function outputMessage(message: string): void {
+  alert(message)
+}
+```
 
+We will be showing or hiding the start button based on the state of our game, so let's give it a class with which we can target it from CSS and JavaScript. We also add an `onclick` attribute and call our new function.
 
+```html
+<button class="start-button" onclick="startGame()">Start Game</button>
+```
 
+Finally, let's hide the button by defining the `hideStartButton` function:
+
+```typescript
+function hideStartButton(): void {
+  let startButton: HTMLButtonElement = document.querySelector(".start-button")
+  startButton.style.display = "none"
+}
+```
+
+Notice the `HTMLButtonElement` type here – HTML elements all have their own types.
+
+### 2. Teaching the computer to play (also, interfaces)
+
+We want a function that returns a guess. This will look something like this:
+
+```js
+function getComputerMove() {
+  let move = Math.floor(Math.random() * 3)
+  return {
+    move: move,
+    user: "Computer"
+  }
+}
+```
+
+That object being returned, we can define an interface for that shape and use this new interface as the type defintion for our function:
+
+```typescript
+interface guess {
+  move: number, // 0, 1 or 2
+  player: string // "User" or "Computer"
+}
+
+function getComputerMove(): guess {
+  let move = Math.floor(Math.random() * 3)
+  return {
+    move: move,
+    player: "Computer
+  }
+}
+```
+
+If we want to test our function is working, we can do so by pasting the below snippet at the bottom of our code and looking in the TypeScript console first for compilation errors, and then if it has compiled successfully, in the browser's JavaScript console to see the log of `computerGuess` – this should be an object with the same shape as the interface we defined above, with the move property one of either 0,1 or 2.
+
+```typescript
+let computerGuess: guess = getComputerMove()
+console.log(computerGuess)
+```
+
+Note that our computerGuess variable is an object that also implements the `guess` interface we defined above. Let's put this interface to work for our user's choice now too.
+
+### 3. Letting the user make their choice
+
+Let's add a button for each of rock, paper and scissors:
+
+```html
+<div class="game-buttons">
+  <button onclick="handleUserChoice(0)">Rock</button>
+  <button onclick="handleUserChoice(1)">Paper</button>
+  <button onclick="handleUserChoice(2)">Scissors</button>
+</div>
+```
+
+And set the containing div's display style property to `none` using CSS. Doing it in CSS ensures it's invisible when the browser first loads, before it's had time to run our JavaScript. (We could have hidden it using JS in much the same way as we hid the start button.)
+
+```css
+.game-buttons {
+  display: none;
+}
+```
+
+Let's update our `hideStartButton` function to show these buttons:
+
+```typescript
+function hideStartButton(): void {
+  let startButton: HTMLButtonElement = document.querySelector(".start-button")
+  let gameButtons: HTMLDivElement = document.querySelector(".game-buttons")
+  startButton.style.display = "none"
+  gameButtons.style.display = "block"
+}
+```
+
+Each of these buttons has a function called `handleUserChoice` in its `onclick` attribute. Let's define this function now:
+
+```typescript
+function handleUserChoice(choice: number): void {
+  let userGuess: guess = {
+    move: choice,
+    player: "User"
+  }
+}
+```
+
+As you can see this function takes a single argument, a number between 0 and 2 (where zero stands for "rock", one for "paper" and so on). It doesn't return anything as it's being called by an HTML button element.
+
+The `userGuess` object also implements our `guess` interface.
+
+#### Improving our `outputMessage` function
+
+Currently whenever we log a message it comes through as an alert. This is quite annoying.
+
+Let's add a section to our HTML that'll contain paragraphs of text, and update our `outputMessage` function to append a new paragraph to this section whenever there's an update:
+
+```html
+  <section class="output"></section>
+</body>
+```
+
+We can style this to make any containing paragraphs big and bold and using whichever system we're on's default font:
+
+```css
+body {
+  /* ... margins, background, etc. */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+/*  ... other css goes here */
+
+.output {
+  font-size: 2rem;
+  font-weight: bold;
+  line-height: 2rem;
+}
+```
+
+We can now update our `outputMessage` function to take advantage of TypeScript's implementation of template literals / string interpolation (better string handling):
+
+```typescript
+function outputMessage(message: string): void {
+  let output: HTMLDivElement = document.querySelector(".output")
+  output.innerHTML += `<p>${message}</p>`
+}
+```
+
+N.B. There doesn't seem to be an `HTMLSectionElement` type, so we're just using the `HTMLDivElement`. If anyone can explain why this is please share with the group.
+
+### 4. Working out who wins (also, enums)
+
+To complete our basic game functionality, we need to actually work out who wins.
+
+Let's extend our `handleUserChoice` function to call our `getComputerMove` function, and we'll pass these both to a new function that will work out who beats who:
+
+```typescript
+function handleUserChoice(choice: number): void {
+  let userGuess: guess = {
+    move: choice,
+    player: "User"
+  }
+  let computerGuess: guess = getComputerMove()
+  outputMessage(`You chose ${userGuess.move}`)
+  outputMessage(`Computer chose ${computerGuess.move}`)
+}
+```
+
+It's fun to use our `outputMessage` function to see the game play out live... but they're just numbers. It's time for `enum's` big entrance.
+
+```typescript
+enum moves {
+  Rock,
+  Paper,
+  Scissors
+}
+```
+
+This is a numeric enum as that's the default enum. If we pop this at the top of our file, and thanks to an enum's ability to give us its value as a string, we can output the words as follows:
+
+```typescript
+outputMessage(`You chose ${moves[userGuess.move]}`)
+outputMessage(`Computer chose ${moves[computerGuess.move]}`)
+```
+
+But enums go further than this. We can use it in our calculateWinner function to determine a winner. At the bottom of our `handleUserChoice` function, let's add a call to a new function, `calculateWinner`:
+
+```typescript
+  // ... rest of handleUserChoice function
+  outputMessage(`Computer chose ${moves[computerGuess.move]}`)
+  let winner: guess = calculateWinner(userGuess, computerGuess)
+}
+
+function calculateWinner(guessOne: guess, guessTwo: guess) : guess {
+  return {player: "Neither", move: guessOne.move }
+}
+```
+
+`calculateWinner` takes two guesses (implementations of our `guess` interface), and returns a `guess`.
+
+Look at how we can use the enum to write code that is very easy to understand:
+
+```typescript
+function calculateWinner(guessOne: guess, guessTwo: guess): guess {
+  if (guessOne.move == guessTwo.move)
+    return { player: "Neither", move: guessOne.move }
+
+  switch (guessOne.move) {
+    case moves.Rock:
+      if (guessTwo.move === moves.Paper) return guessTwo
+      break
+    case moves.Paper:
+      if (guessTwo.move === moves.Scissors) return guessTwo
+      break
+    case moves.Scissors:
+      if (guessTwo.move === moves.Rock) return guessTwo
+      break
+    default:
+      return guessOne
+  }
+  return guessOne
+}
+```
+
+If the moves are the same, we return a guess where the player is "Neither". We then do a swith statement on guessOne's move (we could easily have done it on the other – makes no difference). For each move we write the move that would beat it. If the winning move is present in guessTwo, then guessTwo is the winner.
+
+There are probably more elegant ways of writing this (and if you do come up with something that uses the enum throughout, please do share with the group), but the ability to reason about `moves.Paper` and `moves.Rock`, rather than moves[1] vs moves[0], makes it all much simpler.
+
+This is the beauty of enums.
+
+[View completed branch: 2-game-basics-end](https://github.com/adaapp/rock-paper-typescript/tree/2-game-basics-end)
+
+## Free play
+
+Let's increment our score counters for each player when they win, and output a winner for each move.
+
+```typescript
+function handleUserChoice(choice: number): void {
+  let userGuess: guess = {
+    move: choice,
+    player: "User"
+  }
+  let computerGuess: guess = getComputerMove()
+  outputMessage(`You chose ${moves[userGuess.move]}`)
+  outputMessage(`Computer chose ${moves[computerGuess.move]}`)
+  let winner: guess = calculateWinner(userGuess, computerGuess)
+  if (winner.player === "User") userScore++
+  if (winner.player === "Computer") computerScore++
+  outputMessage(`${winner.player} wins with ${moves[winner.move]}`)
+}
+```
+Your final stretch task is to create a new function called `checkProgress` that increments the counter, checks if either player's score is 2 (meaning they've won two in a row and the round should end) or whether 3 rounds have passed and declares an ultimate winner if so, hiding the buttons and showing the start button.
+
+You can see my completed code in the branch for this section, but do have a go yourself!
+
+[View completed branch: 3-game-complete-end](https://github.com/adaapp/rock-paper-typescript/tree/3-game-complete-end)
 
