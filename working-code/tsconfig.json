@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "module": "system",
+    "noImplicitAny": true,
+    "removeComments": false,
+    "preserveConstEnums": true,
+    "outFile": "./js/game.js",
+    "sourceMap": true,
+    "watch": true
+  },
+  "include": ["ts/**/*"],
+  "exclude": ["img", "js"]
+}
