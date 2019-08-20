@@ -553,7 +553,7 @@ e.g.
 <button onclick="game.handleUserChoice(0)">Rock</button>
 ```
 
-You can grab a working copy of what the code should look like now from this branch:[4-game-oop-refactor-end](https://github.com/adaapp/rock-paper-typescript/tree/4-game-oop-refactor-end) 
+You can grab a working copy of what the code should look like now from this branch: [4-game-oop-refactor-end](https://github.com/adaapp/rock-paper-typescript/tree/4-game-oop-refactor-end) 
 
 (paste the contents of `working-code/ts/game.ts` into your `ts/game.ts`, and similarly the contents of `index.html`.)
 
