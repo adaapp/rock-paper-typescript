@@ -485,3 +485,75 @@ You can see my completed code in the branch for this section, but do have a go y
 
 [View completed branch: 3-game-complete-end](https://github.com/adaapp/rock-paper-typescript/tree/3-game-complete-end)
 
+## OOP Refactor
+
+Your task now is to refactor your code to use typescript classes.
+
+This ought to look something like this:
+
+```typescript
+interface guess {
+  move: number // 0, 1 or 2
+  player: string // "User" or "Computer"
+}
+
+enum moves {
+  Rock,
+  Paper,
+  Scissors
+}
+
+class RockPaperScissors {
+  userScore: number
+  computerScore: number
+  counter: number
+  startButton: HTMLButtonElement
+  gameButtons: HTMLDivElement
+  output: HTMLDivElement
+  constructor() {
+    this.userScore = 0
+    this.computerScore = 0
+    this.counter = 0
+    this.startButton = document.querySelector(".start-button")
+    this.gameButtons = document.querySelector(".game-buttons")
+    this.output = document.querySelector(".output")
+  }
+}
+```
+
+We refactor a function into a method by removing the function keyword and prepending `this.` to any function calls, as we are now calling methods on the class rather than global functions:
+
+```typescript
+class RockPaperScissors {
+  // ... constructor etc.
+  startGame(): void {
+    this.userScore = 0
+    this.computerScore = 0
+    this.counter = 0
+    this.clearOutput()
+    this.outputMessage("The game has begun!")
+    this.hideStartButton()
+  }
+}
+```
+
+Complete the refactor and continue with the workshop once you've got it working. 
+
+You will need to instantiate a game instance at the bottom of your `game.ts` file:
+
+```typescript
+const game: RockPaperScissors = new RockPaperScissors()
+```
+
+And update the HTML `onclick` attributes to call the class methods:
+
+e.g.
+
+```html
+<button onclick="game.handleUserChoice(0)">Rock</button>
+```
+
+You can grab a working copy of what the code should look like now from this branch:[4-game-oop-refactor-end](https://github.com/adaapp/rock-paper-typescript/tree/4-game-oop-refactor-end) 
+
+(paste the contents of `working-code/ts/game.ts` into your `ts/game.ts`, and similarly the contents of `index.html`.)
+
