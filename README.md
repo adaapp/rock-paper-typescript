@@ -66,7 +66,7 @@ Change the title to Rock, Paper, Scissors and add a button element inside the bo
 ```html
 <body>
   <button>Start Game</button>
-</button>
+</body>
 ```
 
 Open this HTML file in your default browser and you should see the button.
@@ -149,6 +149,8 @@ Note that we're not using semi-colons at the end of each line in our TypeScript 
 
 Manually running the `tsc` command each time is a pain. We also want the game.js file to end up in the `js/` directory that we linked to our HTML file. Step forward, `tsconfig.json`.
 
+__Delete the `game.js` file from the `ts` directory.__
+
 #### tsconfig.json
 
 [Go to the docs](https://www.typescriptlang.org/docs/handbook/tsconfig-json.html) and scroll down to the second example. It looks like this at time of writing:
@@ -196,7 +198,7 @@ Check it's all working by running the following from the root of the project:
 
 `$ tsc`
 
-If you refresh your game now you should see the alert from TypeScript.
+This should open a tsc watch process in your terminal (that you can quite with `ctrl c`). Look inside `js/game.js` – since we specified this as the output directory in `tsconfig.json`, the compiler has compiled the contents of `ts/game.ts` into here. If you refresh your game now you should see the alert from TypeScript.
 
 That's the end of the first session.
 
@@ -276,7 +278,7 @@ function getComputerMove(): guess {
   let move = Math.floor(Math.random() * 3)
   return {
     move: move,
-    player: "Computer
+    player: "Computer"
   }
 }
 ```
