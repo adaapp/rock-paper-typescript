@@ -10,6 +10,8 @@ This is what we're building:
 
 ![Screnshot of Rock, Paper, Scissors game](./img/game-screenshot.png)
 
+[Credit: Hand images from Esquire Middle East found via DuckDuckGo Image Search](https://www.esquireme.com/content/20945-how-to-win-at-rock-paper-scissors)
+
 ## Initial setup
 
 ### 1. Clone down this repository:
