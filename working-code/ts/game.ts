@@ -15,6 +15,7 @@ enum moves {
 }
 
 class RockPaperScissors {
+  
   userScore: number
   computerScore: number
   counter: number
@@ -24,6 +25,18 @@ class RockPaperScissors {
   imageList: any[]
   leftImage: string
   rightImage: string
+
+  // time variables
+  dt: number
+  time: number
+  waitTime: number
+  wait: boolean
+
+  callbackStep: any
+
+  // ajustments
+  botScale: number
+
   constructor() {
     this.userScore = 0
     this.computerScore = 0
@@ -32,6 +45,12 @@ class RockPaperScissors {
     this.startButton = document.querySelector(".start-button")
     this.gameButtons = document.querySelector(".game-buttons")
     this.output = document.querySelector(".output")
+
+    this.waitTime = 0
+    this.wait = false
+    this.callbackStep = () => console.log("no step here yet")
+
+    this.botScale = 0;
   }
   startGame(): void {
     this.userScore = 0
@@ -42,6 +61,13 @@ class RockPaperScissors {
   }
   clearOutput(): void {
     this.output.innerHTML = ''
+    
+    // hide hand images on new game
+    this.clearHands()
+  }
+  clearHands(): void{
+    this.rightImage = ""
+    this.leftImage = ""
   }
   outputMessage(message: string): void {
     this.output.innerHTML += `<p>${message}</p>`
@@ -53,6 +79,7 @@ class RockPaperScissors {
   showStartButton(): void {
     this.startButton.style.display = "inline-block"
     this.gameButtons.style.display = "none"
+
   }
   getComputerMove(): guess {
     let move = Math.floor(Math.random() * 3)
@@ -67,6 +94,20 @@ class RockPaperScissors {
       player: "User"
     }
     this.setImageFromChoice(userGuess)
+    
+    // remove bot image
+    this.rightImage = ""
+    
+    // do computer go after some time
+    this.callbackStep = () => this.showComputerMove(userGuess)
+
+    this.waitTime = (Math.random() * 800 ) + 200
+    this.wait = true
+  }
+  showComputerMove(userGuess: guess): void{
+
+    this.botScale = -100;
+
     let computerGuess: guess = this.getComputerMove()
     this.setImageFromChoice(computerGuess)
     let winner: guess = this.calculateWinner(userGuess, computerGuess)
@@ -74,6 +115,12 @@ class RockPaperScissors {
     if (winner.player === "Computer") this.computerScore++
     this.outputMessage(`${winner.player} wins with ${moves[winner.move]}`)
     this.checkRoundProgress()
+
+    this.callbackStep = () => {
+      this.clearHands()
+    }
+    this.waitTime = 2000
+    this.wait = true
   }
   checkRoundProgress(): void {
     this.counter++
@@ -113,11 +160,41 @@ class RockPaperScissors {
     }
   }
   preload(): void {
-    this.imageList = [loadImage('./img/rock.png'), loadImage('./img/paper.png'), loadImage('./img/scissors.png')]
+    this.imageList = [  loadImage('./img/rock.png'), 
+                        loadImage('./img/paper.png'), 
+                        loadImage('./img/scissors.png')
+                      ]
   }
   draw(): void {
-    var bobAmount = Math.sin(millis() / 60) * 3
-    console.log(this.leftImage)
+
+    var bobAmount = Math.sin(millis() / 100) * 3
+
+    // get dt time and show framerate
+    if(!this.time){
+      this.time = millis()
+    }else{
+      this.dt =  millis() - this.time
+      this.time = millis()
+
+      // console.log("Framerate: " + Math.floor((this.dt/60)*100))
+    }
+
+    // wait and callback function    
+    if(this.waitTime > 0){
+
+      this.waitTime = this.waitTime - this.dt
+      console.log(this.waitTime)
+      
+      if(this.waitTime <= 0){
+
+        // do callback
+        console.log("do once")
+        this.callbackStep()
+
+        this.wait = false
+      }
+    }
+    
     if (this.leftImage) {
       image(
         this.leftImage,
@@ -133,9 +210,12 @@ class RockPaperScissors {
         this.rightImage,
         window.innerWidth - 263 - 100,
         window.innerHeight / 2 - 263 + 100 + bobAmount,
-        263,
-        263
+        263 + this.botScale,
+        263 + this.botScale
       )
+    }
+    if(this.botScale < 0){
+      this.botScale += 10
     }
   }
 }
