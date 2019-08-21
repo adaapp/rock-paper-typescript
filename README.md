@@ -149,7 +149,7 @@ Note that we're not using semi-colons at the end of each line in our TypeScript 
 
 Manually running the `tsc` command each time is a pain. We also want the game.js file to end up in the `js/` directory that we linked to our HTML file. Step forward, `tsconfig.json`.
 
-__Delete the `game.js` file from the `ts` directory.__
+**Delete the `game.js` file from the `ts` directory.**
 
 #### tsconfig.json
 
@@ -270,7 +270,7 @@ That object being returned, we can define an interface for that shape and use th
 
 ```typescript
 interface guess {
-  move: number, // 0, 1 or 2
+  move: number // 0, 1 or 2
   player: string // "User" or "Computer"
 }
 
@@ -479,6 +479,7 @@ function handleUserChoice(choice: number): void {
   outputMessage(`${winner.player} wins with ${moves[winner.move]}`)
 }
 ```
+
 Your final stretch task is to create a new function called `checkProgress` that increments the counter, checks if either player's score is 2 (meaning they've won two in a row and the round should end) or whether 3 rounds have passed and declares an ultimate winner if so, hiding the buttons and showing the start button.
 
 You can see my completed code in the branch for this section, but do have a go yourself!
@@ -537,7 +538,7 @@ class RockPaperScissors {
 }
 ```
 
-Complete the refactor and continue with the workshop once you've got it working. 
+Complete the refactor and continue with the workshop once you've got it working.
 
 You will need to instantiate a game instance at the bottom of your `game.ts` file:
 
@@ -553,7 +554,178 @@ e.g.
 <button onclick="game.handleUserChoice(0)">Rock</button>
 ```
 
-You can grab a working copy of what the code should look like now from this branch: [4-game-oop-refactor-end](https://github.com/adaapp/rock-paper-typescript/tree/4-game-oop-refactor-end) 
+You can grab a working copy of what the code should look like now from this branch:[4-game-oop-refactor-end](https://github.com/adaapp/rock-paper-typescript/tree/4-game-oop-refactor-end)
 
 (paste the contents of `working-code/ts/game.ts` into your `ts/game.ts`, and similarly the contents of `index.html`.)
+
+## Animation with P5.js
+
+You'll recall that by default P5 calls two functions once, `preload` and `setup`, and then calls `draw` repeatedly.
+
+Create a new file `ts/sketch.ts` and pop the following into it.
+
+```javascript
+function preload() {
+  game.preload()
+}
+function setup() {
+  createCanvas(window.innerWidth, window.innerHeight)
+}
+function draw() {
+  background("#FEE834")
+  game.draw()
+}
+```
+
+This isn't valid TypeScript so we'll need to do the following:
+
+```typescript
+// Define types for P5 built-in functions
+declare function createCanvas(width: number, height: number): void
+declare function background(colorHex: string): void
+
+function preload(): void {
+  game.preload()
+}
+
+function setup(): void {
+  createCanvas(window.innerWidth, window.innerHeight)
+}
+function draw(): void {
+  background("#FEE834")
+  game.draw()
+}
+```
+
+We are declaring our own TypeScript types here to let the compiler know about P5's functions.
+
+While we're at it, we will need to include a link to the P5 library in our html file:
+
+```html
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.2/p5.js"></script>
+```
+
+The last thing to do is add `draw` and `preload` methods to our `RockPaperScissors` class. The preload method will need to load in the images (as this is just how P5 works):
+
+```typescript
+class RockPaperScissors {
+  // ...
+
+  preload(): void {}
+
+  draw(): void {}
+}
+```
+
+Let's put the three images in an array called `imageList` on the class, and set up holding variables for the image on the left and the image on the right:
+
+```typescript
+class RPS {
+  userScore: number
+  computerScore: number
+  // ...
+  imageList: any[]
+  leftImage: string
+  rightImage: string
+  constructor() {
+    this.userScore = 0
+    //...
+```
+
+We also need to add a TypeScript definition for this function at the top of `game.ts`:
+
+```typescript
+// Define types for P5 built-in functions
+declare function loadImage(imgPath: string): void
+```
+
+Now we can use P5's `loadImage` function:
+
+```typescript
+  preload(): void {
+    this.imageList = [loadImage('./img/rock.png'), loadImage('./img/paper.png'), loadImage('./img/scissors.png')]
+  }
+```
+
+Let's create a method that chooses an image based on a guess, and updates the `leftImage` or the `rightImage`
+
+```typescript
+  setImageFromChoice(choice: guess): void {
+    if (choice.player === "User") {
+      this.leftImage = this.imageList[choice.move]
+    } else {
+      this.rightImage = this.imageList[choice.move]
+    }
+  }
+```
+
+We'll call this function after each of the user and computer's moves:
+
+```typescript
+handleUserChoice(choice: number): void {
+    let userGuess: guess = {
+      move: choice,
+      player: "User"
+    }
+    this.setImageFromChoice(userGuess)
+    let computerGuess: guess = this.getComputerMove()
+    this.setImageFromChoice(computerGuess)
+    // ...
+```
+
+Finally, let's draw these images on the right and the left-hand side of the screen. We're using the width and height of the image (263px) and the width / height of the page to set them 50% of the way down the page, and the right-hand one 100px away from the right-hand edge. It's a bit fiddly, but that's just the way it is!
+
+```typescript
+class RockPaperScissors {
+
+  // ...
+  
+  draw(): void {
+    var bobAmount = Math.sin(millis() / 60) * 3
+    if (this.leftImage) {
+      image(
+        this.leftImage,
+        100,
+        window.innerHeight / 2 - 263 + 100 + bobAmount,
+        263,
+        263
+      )
+    }
+
+    if (this.rightImage) {
+      image(
+        this.rightImage,
+        window.innerWidth - 263 - 100,
+        window.innerHeight / 2 - 263 + 100 + bobAmount,
+        263,
+        263
+      )
+    }
+  }
+}
+```
+
+We're using P5's `millis` and `image` functions, so we'll need to add type defintions for these too. This means working out the type of each of the arguments, and writing a definition:
+
+```typescript
+// Define types for P5 built-in functions
+// ...
+declare function image(imgPath: string, xPos: number, yPos: number, width: number, height: number): void;
+declare function millis(): number;
+```
+
+Phew! That should work now – you should have bobbing images that change every time the user takes a go.
+
+Although – due to the way P5 works, you will have to run this as a web server. If you have python installed on your machine, you can do this as follows:
+
+`$ python -m SimpleHTTPServer 1234`
+
+This will run the project at http://localhost:1234
+
+There are other ways of running a local server – required for P5 to display images. 
+
+You can view the completed code for this section in the following branch:
+
+[5-animation-workshop-p5-end](https://github.com/adaapp/rock-paper-typescript/tree/5-animation-workshop-p5-end)
 
