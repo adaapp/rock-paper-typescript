@@ -680,9 +680,8 @@ Finally, let's draw these images on the right and the left-hand side of the scre
 
 ```typescript
 class RockPaperScissors {
-
   // ...
-  
+
   draw(): void {
     var bobAmount = Math.sin(millis() / 60) * 3
     if (this.leftImage) {
@@ -713,8 +712,14 @@ We're using P5's `millis` and `image` functions, so we'll need to add type defin
 ```typescript
 // Define types for P5 built-in functions
 // ...
-declare function image(imgPath: string, xPos: number, yPos: number, width: number, height: number): void;
-declare function millis(): number;
+declare function image(
+  imgPath: string,
+  xPos: number,
+  yPos: number,
+  width: number,
+  height: number
+): void
+declare function millis(): number
 ```
 
 Phew! That should work now – you should have bobbing images that change every time the user takes a go.
@@ -725,9 +730,69 @@ Although – due to the way P5 works, you will have to run this as a web server.
 
 This will run the project at http://localhost:1234
 
-There are other ways of running a local server – required for P5 to display images. 
+There are other ways of running a local server – required for P5 to display images.
 
 You can view the completed code for this section in the following branch:
 
 [5-animation-workshop-p5-end](https://github.com/adaapp/rock-paper-typescript/tree/5-animation-workshop-p5-end)
 
+## React Refactor
+
+This session will be delivered as a follow-along workshop. This README.md will be updated after the session.
+
+1. Checkout end of previous branch `$ git fetch && git checkout 5-animation-workshop-p5-end`
+2. Install CreateReactApp
+3. Add models folder to src. Copy over RockPaperScissors.ts and export the class at the bottom of the file
+4. Install typescript `$ npm install typescript`
+
+CRA will detect TypeScript and create a `tsconfig.json` file for you.
+
+5. Install p5: `$ npm install p5`
+
+And include it at the top of `App.js`
+
+Copy over CSS from head of original project into App.css
+
+Copy over HTML and put it into App.js's return.
+
+Include our model in App.js
+
+Remove JS dom manipulation from RockPaperScissors.ts
+Add this.leftImage and this.rightImage to the constructor, assigning them empty strings
+
+6. Get RPS working with React Button handlers
+
+- remove CSS that hides RPS buttons
+
+```JSX
+
+import React, { useState } from "react"
+
+// ...
+
+  function handleStart(e) {
+    setShowStart(false)
+    game.startGame()
+  }
+
+  return(
+
+    <div className="game-wrapper">
+      {showStart && (
+        <button onClick={handleStart} className="start-button">
+          Start Game
+        </button>
+      )}
+      {!showStart && (
+        <>
+          <div className="game-buttons">
+            <button onClick={() => handleUserChoice(0)}>Rock</button>
+            <button onClick={() => handleUserChoice(1)}>Paper</button>
+            <button onClick={() => handleUserChoice(2)}>Scissors</button>
+          </div>
+          <section className="output">{game.leftImage}</section>
+        </>
+      )}
+    </div>
+  )
+```
