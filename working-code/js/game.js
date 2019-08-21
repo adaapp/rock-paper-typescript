@@ -9,6 +9,7 @@ var RockPaperScissors = /** @class */ (function () {
         this.userScore = 0;
         this.computerScore = 0;
         this.counter = 0;
+        this.imageList = [];
         this.startButton = document.querySelector(".start-button");
         this.gameButtons = document.querySelector(".game-buttons");
         this.output = document.querySelector(".output");
@@ -46,7 +47,9 @@ var RockPaperScissors = /** @class */ (function () {
             move: choice,
             player: "User"
         };
+        this.setImageFromChoice(userGuess);
         var computerGuess = this.getComputerMove();
+        this.setImageFromChoice(computerGuess);
         var winner = this.calculateWinner(userGuess, computerGuess);
         if (winner.player === "User")
             this.userScore++;
@@ -89,7 +92,38 @@ var RockPaperScissors = /** @class */ (function () {
         }
         return guessOne;
     };
+    RockPaperScissors.prototype.setImageFromChoice = function (choice) {
+        if (choice.player === "User") {
+            this.leftImage = this.imageList[choice.move];
+        }
+        else {
+            this.rightImage = this.imageList[choice.move];
+        }
+    };
+    RockPaperScissors.prototype.preload = function () {
+        this.imageList = [loadImage('./img/rock.png'), loadImage('./img/paper.png'), loadImage('./img/scissors.png')];
+    };
+    RockPaperScissors.prototype.draw = function () {
+        var bobAmount = Math.sin(millis() / 60) * 3;
+        console.log(this.leftImage);
+        if (this.leftImage) {
+            image(this.leftImage, 100, window.innerHeight / 2 - 263 + 100 + bobAmount, 263, 263);
+        }
+        if (this.rightImage) {
+            image(this.rightImage, window.innerWidth - 263 - 100, window.innerHeight / 2 - 263 + 100 + bobAmount, 263, 263);
+        }
+    };
     return RockPaperScissors;
 }());
 var game = new RockPaperScissors();
+function preload() {
+    game.preload();
+}
+function setup() {
+    createCanvas(window.innerWidth, window.innerHeight);
+}
+function draw() {
+    background('#FEE834');
+    game.draw();
+}
 //# sourceMappingURL=game.js.map
