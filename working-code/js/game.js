@@ -90,11 +90,11 @@ var RockPaperScissors = /** @class */ (function () {
             this.showStartButton();
             this.counter = 0;
             if (this.userScore > this.computerScore)
-                this.outputMessage("You won that round!");
+                this.outputMessage("You won that round! <br><span class='emoji win'>🥳</span>");
             else if (this.userScore === this.computerScore)
-                this.outputMessage("You drew that round");
+                this.outputMessage("You drew that round.<br><span class='emoji'>😐</span>");
             else
-                this.outputMessage("You lost that round!");
+                this.outputMessage("You lost that round!<br><span class='emoji'>😢</span>");
         }
     };
     RockPaperScissors.prototype.calculateWinner = function (guessOne, guessTwo) {
